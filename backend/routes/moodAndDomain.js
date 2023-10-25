@@ -4,7 +4,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const moods_response = await req.app.locals.elasticClient.search({
-      index: "poems",
+      index: process.env.ELASTIC_SERCH_INDEX,
       body: {
         size: 0, // Setting size to 0 to retrieve only aggregation results
         aggs: {
@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
     });
 
     const domain_response = await req.app.locals.elasticClient.search({
-      index: "poems",
+      index: process.env.ELASTIC_SERCH_INDEX,
       body: {
         size: 0, // Setting size to 0 to retrieve only aggregation results
         aggs: {

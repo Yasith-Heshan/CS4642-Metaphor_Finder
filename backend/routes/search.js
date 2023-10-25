@@ -76,7 +76,7 @@ router.post("/", async (req, res) => {
     }
 
     const initial_poems_response = await req.app.locals.elasticClient.search({
-      index: "poems",
+      index: process.env.ELASTIC_SERCH_INDEX,
       body: {
         query: {
           match_all: {},
@@ -89,7 +89,7 @@ router.post("/", async (req, res) => {
     const initial_poems = initial_poems_response.hits.hits;
 
     const response = await req.app.locals.elasticClient.search({
-      index: "poems",
+      index: process.env.ELASTIC_SERCH_INDEX,
       body: {
         query: suitable_query,
         size: 228,

@@ -12,14 +12,14 @@ const port = process.env.PORT;
 
 require("array.prototype.flatmap").shim();
 const { Client } = require("@elastic/elasticsearch");
-const client = new Client({ node: "http://localhost:9200" });
+const client = new Client({ node: process.env.ELASTIC_SEARCH_NODE });
 
 app.locals.elasticClient = client;
 console.log("Connected to Elasticsearch");
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.FRONTEND_BASE_URL,
     credentials: true,
   })
 );
@@ -38,24 +38,31 @@ const mappings_data = readJsonFile("jsons/mapping_file.json");
 const dataset = readJsonFile("jsons/dataset.json");
 
 async function run() {
-  // Check if the 'poems' index exists
-  const indexExists = await client.indices.exists({ index: "poems" });
+  // Check if the index exists
+  const indexExists = await client.indices.exists({
+    index: process.env.ELASTIC_SERCH_INDEX,
+  });
 
   if (indexExists) {
-    const deleteResponse = await client.indices.delete({ index: "poems" });
+    const deleteResponse = await client.indices.delete({
+      index: process.env.ELASTIC_SERCH_INDEX,
+    });
     console.log("Index deleted:", deleteResponse);
   }
   // Create a new index
   const createResponse = await client.indices.create(
     {
-      index: "poems",
+      index: process.env.ELASTIC_SERCH_INDEX,
       body: mappings_data,
     },
     { ignore: [400] }
   );
   console.log("Index created:", createResponse);
 
-  const body = dataset.flatMap((doc) => [{ index: { _index: "poems" } }, doc]);
+  const body = dataset.flatMap((doc) => [
+    { index: { _index: process.env.ELASTIC_SERCH_INDEX } },
+    doc,
+  ]);
 
   const bulkResponse = await client.bulk({ refresh: true, body });
 
@@ -75,7 +82,7 @@ async function run() {
     console.log(erroredDocuments);
   }
 
-  const count = await client.count({ index: "poems" });
+  const count = await client.count({ index: process.env.ELASTIC_SERCH_INDEX });
   console.log(count);
 }
 
