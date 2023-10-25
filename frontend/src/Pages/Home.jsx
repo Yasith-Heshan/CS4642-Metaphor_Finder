@@ -22,6 +22,7 @@ export const Home = () => {
   const [domains, setDomains] = useState([]);
   const [moods, setMoods] = useState([]);
 
+
   const baseUrl = process.env.REACT_APP_BASE_URL;
 
   useEffect(() => {
